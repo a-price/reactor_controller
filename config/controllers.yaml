@@ -71,7 +71,7 @@ dynamixel_controllers:
       package: dynamixel_controllers
       module: joint_position_controller
       type: JointPositionController
-    joint_name: gripper_joint
+    joint_name: finger_joint
     joint_speed: 1.5
     motor:
       id: 8
