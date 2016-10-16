@@ -31,6 +31,7 @@ if(${moveit_core_FOUND})
   )
 
   add_executable(twist_controller src/twist_controller.cpp)
+  add_executable(dynamixel_to_joint_state src/dynamixel_to_joint_state.cpp)
 else()
   message(WARNING "MoveIt not found, so not building controllers.")
   catkin_package()

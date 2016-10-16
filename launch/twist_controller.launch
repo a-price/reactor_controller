@@ -1,0 +1,16 @@
+<launch>
+	<param name="/robot_description" textfile="$(find reactor_description)/robots/reactor_description.URDF" />
+	<param name="/robot_description_semantic" textfile="$(find reactor_moveit_config)/config/reactor_description.srdf" />
+
+	<node name="spacenav_node" pkg="spacenav_node" type="spacenav_node" />
+	<node name="twist_controller" pkg="reactor_controller" type="twist_controller" output="screen" >
+		<remap from="joint_trajectory" to="trajectory_controller/command" />
+	</node>
+	<node name="dxl_to_js" pkg="reactor_controller" type="dynamixel_to_joint_state" output="screen" >
+		<remap from="motor_descriptions" to="/dynamixel/arbotix_port" />
+		<remap from="motor_states" to="/motor_states/arbotix_port" />
+	</node>
+
+	<include file="$(find reactor_controller)/launch/reactor.launch" />
+	
+</launch>

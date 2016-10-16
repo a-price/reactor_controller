@@ -299,6 +299,7 @@ void twist_cb(const geometry_msgs::TwistConstPtr& twist)
 
 	pSetpoint->enforceBounds();
 
+
 	command_setpoint(*pSetpoint);
 }
 
@@ -360,7 +361,7 @@ int main(int argc, char** argv)
 	}
 	command_setpoint(*pSetpoint);
 
-	jsPub = nh.advertise<sensor_msgs::JointState>("/joint_states", 1, true);//("/joint_setpoints", 1, true);
+	jsPub = nh.advertise<sensor_msgs::JointState>("/joint_setpoints", 1, true);
 	jtPub = nh.advertise<trajectory_msgs::JointTrajectory>("/joint_trajectory", 1, true);
 
 	ros::Subscriber twistSub = nh.subscribe("/spacenav/twist", 1, twist_cb);
