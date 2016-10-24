@@ -1,0 +1,13 @@
+<launch>
+  <!-- Load robot model and world -->
+  <include file="$(find reactor_description)/launch/gazebo.launch"/>
+
+  <!-- Load specific controllers to Gazebo -->
+  <rosparam file="$(find reactor_controller)/config/gazebo_controller.yaml" command="load"/>
+  <node name="arm_controller_spawner" pkg="controller_manager" type="spawner" output="screen" args="trajectory_controllers --shutdown-timeout 0.5"/>
+
+  <!-- joint_state_controller -->
+  <rosparam file="$(find reactor_controller)/config/joint_state_controller.yaml" command="load"/>
+  <node name="joint_state_controller_spawner" pkg="controller_manager" type="spawner" args="joint_state_controller --shutdown-timeout 0.5" />
+
+</launch>
