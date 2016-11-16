@@ -1,40 +1,48 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(reactor_controller)
 
-## Find catkin macros and libraries
-find_package(catkin REQUIRED)
+if( NOT CMAKE_BUILD_TYPE )
+  set(CMAKE_BUILD_TYPE "RelWithDebInfo")
+endif()
+set(BUILD_FLAGS "-std=c++0x -Wall -Wextra -Wshadow -Wnon-virtual-dtor -Wpedantic -Werror")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${BUILD_FLAGS}")
+
 
 ## If MoveIt exists, build twist controller
 find_package(moveit_core QUIET)
 if(${moveit_core_FOUND})
+  ## Find catkin macros and libraries
   find_package(catkin REQUIRED
     cmake_modules
+    dynamixel_msgs
     moveit_core
     moveit_msgs
     moveit_ros_planning
   )
-
-  if( NOT CMAKE_BUILD_TYPE )
-    set(CMAKE_BUILD_TYPE "RelWithDebInfo")
-  endif()
-  set(BUILD_FLAGS "-std=c++0x -Wall -Wextra -Wshadow -Wnon-virtual-dtor -Wpedantic -Werror")
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${BUILD_FLAGS}")
-
-  catkin_package()
-
-  include_directories(SYSTEM
-    ${catkin_INCLUDE_DIRS}
-  )
-
-  link_libraries(
-    ${catkin_LIBRARIES}
-  )
-
-  add_executable(twist_controller src/twist_controller.cpp)
-  add_executable(dynamixel_to_joint_state src/dynamixel_to_joint_state.cpp)
 else()
   message(WARNING "MoveIt not found, so not building controllers.")
-  catkin_package()
+  ## Find catkin macros and libraries
+  find_package(catkin REQUIRED
+    dynamixel_msgs
+  )
+endif()
+
+catkin_package()
+
+include_directories(SYSTEM
+  ${catkin_INCLUDE_DIRS}
+)
+
+link_libraries(
+  ${catkin_LIBRARIES}
+)
+
+add_executable(dynamixel_to_joint_state src/dynamixel_to_joint_state.cpp)
+add_dependencies(dynamixel_to_joint_state ${catkin_EXPORTED_TARGETS})
+
+if(${moveit_core_FOUND})
+  add_executable(twist_controller src/twist_controller.cpp)
+  add_dependencies(twist_controller ${catkin_EXPORTED_TARGETS})
 endif()
 
 ###########
