@@ -18,12 +18,16 @@ if(${moveit_core_FOUND})
     moveit_core
     moveit_msgs
     moveit_ros_planning
+    roscpp
+    urdf
   )
 else()
   message(WARNING "MoveIt not found, so not building controllers.")
   ## Find catkin macros and libraries
   find_package(catkin REQUIRED
     dynamixel_msgs
+    roscpp
+    urdf
   )
 endif()
 
