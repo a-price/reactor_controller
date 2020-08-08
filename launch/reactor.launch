@@ -2,6 +2,8 @@
 	<param name="robot_description" textfile="$(find reactor_description)/robots/reactor_description.URDF" />
 	<rosparam file="$(find reactor_controller)/config/controllers.yaml" command="load" />
 
+	<param name="/trajectory_controller/joint_trajectory_action_node/fill_missing" value="True" />
+
 	<node name="dynamixel_trajectory_controller" pkg="dynamixel_controllers" type="trajectory_controller.py"
 	      args="dynamixel_controllers"
 	      output="screen" >
