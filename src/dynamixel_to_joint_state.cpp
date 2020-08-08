@@ -61,7 +61,7 @@ void dmxCallback(const dynamixel_msgs::MotorStateListPtr& dmx)
 
 	for (dynamixel_msgs::MotorState motorState : dmx->motor_states)
 	{
-		std::map<int, std::string>::iterator entry = motorIDtoName.find(motorState.id);
+		const auto& entry = motorIDtoName.find(motorState.id);
 		if (motorIDtoName.end() == entry) { continue; }
 
 		std::string jointName = entry->second;
@@ -118,10 +118,9 @@ int main(int argc, char** argv)
 	}
 
 	// Create map from ID to name
-	for (XmlRpc::XmlRpcValue::iterator iter = controllerXml.begin();
-		 iter != controllerXml.end(); ++iter)
+	for (const auto & iter : controllerXml)
 	{
-		XmlRpc::XmlRpcValue controller = iter->second;
+		XmlRpc::XmlRpcValue controller = iter.second;
 		if (controller.hasMember("motor"))
 		{
 			motorIDtoName[(int&)(controller["motor"]["id"])] = (std::string&)(controller["joint_name"]);

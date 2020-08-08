@@ -3,10 +3,19 @@
 	<rosparam file="$(find reactor_controller)/config/controllers.yaml" command="load" />
 
 	<node name="dynamixel_trajectory_controller" pkg="dynamixel_controllers" type="trajectory_controller.py"
-          args="dynamixel_controllers"
-          output="screen" >
+	      args="dynamixel_controllers"
+	      output="screen" >
 		<rosparam file="$(find reactor_controller)/config/manager.yaml" command="load" />
-    </node>
+		<remap from="trajectory_controller/follow_joint_trajectory/goal" to="follow_joint_trajectory/goal" />
+		<remap from="trajectory_controller/follow_joint_trajectory/cancel" to="follow_joint_trajectory/cancel" />
+		<remap from="trajectory_controller/follow_joint_trajectory/status" to="follow_joint_trajectory/status" />
+		<remap from="trajectory_controller/follow_joint_trajectory/feedback" to="follow_joint_trajectory/feedback" />
+		<remap from="trajectory_controller/follow_joint_trajectory/result" to="follow_joint_trajectory/result" />
+	</node>
+	<node name="dxl_to_js" pkg="reactor_controller" type="dynamixel_to_joint_state" output="screen" >
+		<remap from="motor_descriptions" to="/dynamixel/arbotix_port" />
+		<remap from="motor_states" to="/motor_states/arbotix_port" />
+	</node>
 
 	<node name="robot_state_publisher" pkg="robot_state_publisher" type="state_publisher" />
 </launch>

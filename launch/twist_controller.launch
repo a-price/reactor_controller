@@ -6,10 +6,6 @@
 	<node name="twist_controller" pkg="reactor_controller" type="twist_controller" output="screen" >
 		<remap from="joint_trajectory" to="trajectory_controller/command" />
 	</node>
-	<node name="dxl_to_js" pkg="reactor_controller" type="dynamixel_to_joint_state" output="screen" >
-		<remap from="motor_descriptions" to="/dynamixel/arbotix_port" />
-		<remap from="motor_states" to="/motor_states/arbotix_port" />
-	</node>
 
 	<include file="$(find reactor_controller)/launch/reactor.launch" />
 	
