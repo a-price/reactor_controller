@@ -116,7 +116,7 @@ bool pseudoInverse(const _Matrix_Type_ &a, _Matrix_Type_ &result, double
 }
 
 // Callback for Buttons Only
-void gripper_cb(const sensor_msgs::JoyConstPtr pJoy)
+void gripper_cb(const sensor_msgs::JoyConstPtr& pJoy)
 {
 	joy = *pJoy;
 }
@@ -306,7 +306,7 @@ void twist_cb(const geometry_msgs::TwistConstPtr& twist)
 std::ostream& operator<<(std::ostream& os, const std::vector<std::string>& v)
 {
 	os << "{ ";
-	for (const std::string s : v) { os << "'" << s << "' "; }
+	for (const std::string& s : v) { os << "'" << s << "' "; }
 	os << "}";
 	return os;
 }
@@ -353,16 +353,16 @@ int main(int argc, char** argv)
 	pSetpoint.reset(new robot_state::RobotState(pModel));
 	pSetpoint->setToDefaultValues();
 
+	jsPub = nh.advertise<sensor_msgs::JointState>("/joint_setpoints", 1, true);
+	jtPub = nh.advertise<trajectory_msgs::JointTrajectory>("/joint_trajectory", 1, true);
+
 	std::map<std::string, double> readyPose;
 	pArmGroup->getVariableDefaultPositions(INIT_STATE_NAME, readyPose);
-	for (const std::pair<std::string, double>& p : readyPose)
+	for (const auto& p : readyPose)
 	{
 		pSetpoint->setVariablePosition(p.first, p.second);
 	}
 	command_setpoint(*pSetpoint);
-
-	jsPub = nh.advertise<sensor_msgs::JointState>("/joint_setpoints", 1, true);
-	jtPub = nh.advertise<trajectory_msgs::JointTrajectory>("/joint_trajectory", 1, true);
 
 	ros::Subscriber twistSub = nh.subscribe("/spacenav/twist", 1, twist_cb);
 	ros::Subscriber joySub = nh.subscribe("/spacenav/joy", 1, gripper_cb);
