@@ -4,7 +4,7 @@ project(reactor_controller)
 if( NOT CMAKE_BUILD_TYPE )
   set(CMAKE_BUILD_TYPE "RelWithDebInfo")
 endif()
-set(BUILD_FLAGS "-std=c++0x -Wall -Wextra -Wshadow -Wnon-virtual-dtor -Wpedantic -Werror")
+set(BUILD_FLAGS "-std=c++14 -Wall -Wextra -Wshadow -Wnon-virtual-dtor -Wpedantic -Werror")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${BUILD_FLAGS}")
 
 

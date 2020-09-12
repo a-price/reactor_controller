@@ -44,6 +44,8 @@
 
 #include <Eigen/SVD>
 
+#include <memory>
+
 const std::string ARM_GROUP_NAME = "arm";
 const std::string GRIPPER_GROUP_NAME = "gripper";
 const std::string INIT_STATE_NAME = "ready";
@@ -54,6 +56,7 @@ robot_model::JointModelGroup* pGripperGroup; // NB: Memory managed by RobotModel
 
 ros::Publisher jsPub, jtPub;
 
+sensor_msgs::JointState jointState;
 sensor_msgs::Joy joy;
 robot_state::RobotStatePtr pSetpoint;
 
@@ -119,6 +122,11 @@ bool pseudoInverse(const _Matrix_Type_ &a, _Matrix_Type_ &result, double
 void gripper_cb(const sensor_msgs::JoyConstPtr& pJoy)
 {
 	joy = *pJoy;
+}
+
+void joint_cb(const sensor_msgs::JointStateConstPtr& pJoints)
+{
+	jointState = *pJoints;
 }
 
 // Send state as command
@@ -325,7 +333,10 @@ int main(int argc, char** argv)
 	pnh.param("angular_scale", rotScale, rotScale);
 	pnh.param("deadband", deadband, deadband);
 
-	std::unique_ptr<robot_model_loader::RobotModelLoader> pLoader(new robot_model_loader::RobotModelLoader());
+
+	ros::Subscriber jointSub = nh.subscribe("/joint_states", 1, joint_cb);
+
+	auto pLoader = std::make_unique<robot_model_loader::RobotModelLoader>();
 	pModel = pLoader->getModel();
 
 	const std::vector<std::string>& groupNames = pModel->getJointModelGroupNames();
@@ -350,18 +361,32 @@ int main(int argc, char** argv)
 		return -1;
 	}
 
-	pSetpoint.reset(new robot_state::RobotState(pModel));
+	pSetpoint = std::make_shared<robot_state::RobotState>(pModel);
 	pSetpoint->setToDefaultValues();
 
 	jsPub = nh.advertise<sensor_msgs::JointState>("/joint_setpoints", 1, true);
 	jtPub = nh.advertise<trajectory_msgs::JointTrajectory>("/joint_trajectory", 1, true);
 
+	// Set based on named pose
 	std::map<std::string, double> readyPose;
 	pArmGroup->getVariableDefaultPositions(INIT_STATE_NAME, readyPose);
 	for (const auto& p : readyPose)
 	{
 		pSetpoint->setVariablePosition(p.first, p.second);
 	}
+
+	// Set based on current pose, if it exists
+	for (int i = 0; i < 5 && jointState.name.empty(); ++i)
+	{
+		ros::Duration(1.0).sleep();
+		ros::spinOnce();
+	}
+	if (!jointState.name.empty())
+	{
+		ROS_INFO("Setting joints from readings.");
+		pSetpoint->setVariableValues(jointState);
+	}
+
 	command_setpoint(*pSetpoint);
 
 	ros::Subscriber twistSub = nh.subscribe("/spacenav/twist", 1, twist_cb);
